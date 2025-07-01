@@ -1,0 +1,244 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definição do sistema de design para La Gemme Leilões. 
+   Todas as cores, gradientes, fontes, etc devem ser definidas aqui.
+   Paleta restrita: #ffffff, #5e5d5d, #b2b1b1, #6b6b6b
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 37%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 37%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 37%;
+
+    --primary: 0 0% 37%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 70%;
+    --secondary-foreground: 0 0% 37%;
+
+    --muted: 0 0% 70%;
+    --muted-foreground: 0 0% 42%;
+
+    --accent: 0 0% 70%;
+    --accent-foreground: 0 0% 37%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 70%;
+    --input: 0 0% 70%;
+    --ring: 0 0% 37%;
+
+    --radius: 0.5rem;
+
+    /* Cores personalizadas La Gemme usando a paleta especificada */
+    --lagemme-white: 0 0% 100%;      /* #ffffff */
+    --lagemme-dark: 0 0% 37%;        /* #5e5d5d */
+    --lagemme-light: 0 0% 70%;       /* #b2b1b1 */
+    --lagemme-medium: 0 0% 42%;      /* #6b6b6b */
+  }
+
+  .dark {
+    --background: 0 0% 37%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 37%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 37%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 37%;
+
+    --secondary: 0 0% 42%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 42%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 0 0% 42%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 42%;
+    --input: 0 0% 42%;
+    --ring: 0 0% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 
+                 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 
+                 sans-serif;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    width: 100vw;
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Tipografia elegante para casa de leilões */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-light tracking-wide;
+  }
+  
+  /* Transições suaves para melhor UX */
+  a, button {
+    @apply transition-all duration-200;
+  }
+}
+
+/* Classes utilitárias personalizadas para La Gemme */
+@layer utilities {
+  .text-lagemme-dark {
+    color: hsl(var(--lagemme-dark));
+  }
+  
+  .text-lagemme-medium {
+    color: hsl(var(--lagemme-medium));
+  }
+  
+  .text-lagemme-light {
+    color: hsl(var(--lagemme-light));
+  }
+  
+  .bg-lagemme-white {
+    background-color: hsl(var(--lagemme-white));
+  }
+  
+  .bg-lagemme-dark {
+    background-color: hsl(var(--lagemme-dark));
+  }
+  
+  .bg-lagemme-light {
+    background-color: hsl(var(--lagemme-light));
+  }
+  
+  .border-lagemme-light {
+    border-color: hsl(var(--lagemme-light));
+  }
+  
+  /* Animações suaves para o menu lateral */
+  .menu-slide-enter {
+    transform: translateX(100%);
+  }
+  
+  .menu-slide-enter-active {
+    transform: translateX(0);
+    transition: transform 300ms ease-in-out;
+  }
+  
+  .menu-slide-exit {
+    transform: translateX(0);
+  }
+  
+  .menu-slide-exit-active {
+    transform: translateX(100%);
+    transition: transform 300ms ease-in-out;
+  }
+
+  /* Prevenção rigorosa de overflow horizontal */
+  .no-horizontal-scroll {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+  }
+
+  /* Container que nunca extrapola */
+  .container {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* Regra universal para prevenir overflow horizontal */
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Prevenção específica para elementos de texto longos */
+p, span, div, a {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Correções específicas para componentes Radix UI Select */
+@layer components {
+  /* Forçar scroll sempre visível quando Select está aberto */
+  body.select-open,
+  html:has([data-radix-select-content]) {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    padding-right: 0 !important;
+    scrollbar-gutter: stable;
+  }
+  
+  /* Garantir que o conteúdo do Select tenha fundo sólido e z-index alto */
+  [data-radix-select-content] {
+    background-color: white !important;
+    z-index: 9999 !important;
+    box-shadow: 0 10px 38px -10px rgba(22, 23, 24, 0.35), 0 10px 20px -15px rgba(22, 23, 24, 0.2) !important;
+  }
+  
+  /* Prevenir mudanças no layout durante portals */
+  [data-radix-portal] {
+    position: fixed !important;
+  }
+}
+
+/* Regras para scrollbar personalizada */
+html, body {
+  scrollbar-width: auto;
+  scrollbar-color: #b2b1b1 #ffffff;
+}
+
+/* Para navegadores WebKit */
+::-webkit-scrollbar {
+  width: 16px;
+  background-color: #ffffff;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #b2b1b1;
+  border-radius: 8px;
+  border: 2px solid #ffffff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #6b6b6b;
+}
