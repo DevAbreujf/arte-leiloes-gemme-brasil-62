@@ -17,7 +17,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-100 border-t border-gray-300 mt-auto w-full overflow-hidden">
-      <div className="container mx-auto px-6 md:px-8 lg:px-12 py-12 max-w-full">
+      <div className="container mx-auto px-6 md:px-12 lg:px-24 py-12 max-w-full">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Menu */}
           <div className="min-w-0">
@@ -35,7 +35,7 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                  href="#" 
+                  href="https://www.iarremate.com/quero-comprar" 
                   className="text-lagemme-medium hover:text-lagemme-dark transition-colors duration-200 text-sm block truncate"
                 >
                   {t('howToBuy')}
@@ -43,7 +43,7 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                  href="#" 
+                  href="https://www.iarremate.com/quero-vender" 
                   className="text-lagemme-medium hover:text-lagemme-dark transition-colors duration-200 text-sm block truncate"
                 >
                   {t('howToSell')}
@@ -51,7 +51,7 @@ const Footer = () => {
               </li>
               <li>
                 <a 
-                  href="#" 
+                  href="/quem-somos" 
                   className="text-lagemme-medium hover:text-lagemme-dark transition-colors duration-200 text-sm block truncate"
                 >
                   {t('aboutUs')}

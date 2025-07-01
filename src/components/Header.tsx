@@ -18,7 +18,7 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
 
   return (
     <header className="fixed top-12 left-0 right-0 bg-white shadow-sm z-40 border-b border-gray-200">
-      <div className="container mx-auto px-4 md:px-6 lg:px-8">
+      <div className="container mx-auto px-6 md:px-12 lg:px-24">
         <div className="flex items-center h-20 md:h-28">
           {/* Logo */}
           <div className="flex-shrink-0 mr-4 md:mr-0">

@@ -12,7 +12,7 @@ const TopBar = () => {
   return (
     <div className="fixed top-0 left-0 right-0 bg-gray-800 text-white z-50 h-12 overflow-hidden">
       <div className="py-3 px-4 h-full flex items-center">
-        <div className="container mx-auto px-0 overflow-hidden">
+        <div className="container mx-auto px-6 md:px-12 lg:px-24 overflow-hidden">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between text-sm overflow-hidden">
             <div className="mb-1 md:mb-0 font-medium truncate text-xs md:text-sm">
               {t('serviceHours')}

@@ -40,7 +40,8 @@ const SideMenu = ({ isOpen, onClose }: SideMenuProps) => {
     { 
       key: 'howToBuy', 
       label: t('howToBuy'), 
-      path: '/como-comprar',
+      path: 'https://www.iarremate.com/quero-comprar',
+      external: true,
       icon: (
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
@@ -50,7 +51,8 @@ const SideMenu = ({ isOpen, onClose }: SideMenuProps) => {
     { 
       key: 'howToSell', 
       label: t('howToSell'), 
-      path: '/como-vender',
+      path: 'https://www.iarremate.com/quero-vender',
+      external: true,
       icon: (
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
@@ -114,14 +116,27 @@ const SideMenu = ({ isOpen, onClose }: SideMenuProps) => {
           <ul className="space-y-2 px-4">
             {menuItems.map((item) => (
               <li key={item.key}>
-                <Link
-                  to={item.path}
-                  onClick={onClose}
-                  className="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-700 rounded-md transition-colors duration-200"
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                </Link>
+                {item.external ? (
+                  <a
+                    href={item.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={onClose}
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-700 rounded-md transition-colors duration-200"
+                  >
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </a>
+                ) : (
+                  <Link
+                    to={item.path}
+                    onClick={onClose}
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-gray-700 rounded-md transition-colors duration-200"
+                  >
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
