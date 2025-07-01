@@ -17,7 +17,7 @@ const QuemSomos = () => {
         <div 
           className="h-64 md:h-80 bg-cover bg-center bg-no-repeat relative"
           style={{
-            backgroundImage: `url('/lovable-uploads/eb3d0ff0-6e50-4752-b1a4-b80a47162919.png')`
+            backgroundImage: `url('/images/hero/quem-somos-bg.png')`
           }}
         >
           {/* Overlay escuro para melhor legibilidade do texto */}

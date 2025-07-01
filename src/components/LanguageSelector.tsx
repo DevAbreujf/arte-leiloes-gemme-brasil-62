@@ -44,8 +44,8 @@ const LanguageSelector = () => {
           <div className="flex items-center space-x-2">
             <img 
               src={language === 'pt' 
-                ? "/lovable-uploads/7e608d2d-549f-4b22-8913-32f9c3aeec66.png" 
-                : "/lovable-uploads/cac930c4-4100-42fc-8013-98b2a37fcddf.png"
+                ? "/images/flags/brazil.png" 
+                : "/images/flags/usa.png"
               }
               alt={language === 'pt' ? "Bandeira do Brasil" : "Bandeira dos EUA"}
               className="w-4 h-3 rounded-sm object-cover"
@@ -67,7 +67,7 @@ const LanguageSelector = () => {
         <SelectItem value="pt" className="cursor-pointer hover:bg-gray-100 focus:bg-gray-100">
           <div className="flex items-center space-x-2">
             <img 
-              src="/lovable-uploads/7e608d2d-549f-4b22-8913-32f9c3aeec66.png" 
+              src="/images/flags/brazil.png" 
               alt="Bandeira do Brasil" 
               className="w-4 h-3 rounded-sm object-cover"
             />
@@ -77,7 +77,7 @@ const LanguageSelector = () => {
         <SelectItem value="en" className="cursor-pointer hover:bg-gray-100 focus:bg-gray-100">
           <div className="flex items-center space-x-2">
             <img 
-              src="/lovable-uploads/cac930c4-4100-42fc-8013-98b2a37fcddf.png" 
+              src="/images/flags/usa.png" 
               alt="Bandeira dos EUA" 
               className="w-4 h-3 rounded-sm object-cover"
             />

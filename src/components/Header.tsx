@@ -24,7 +24,7 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
           <div className="flex-shrink-0 mr-4 md:mr-0">
             <Link to="/">
               <img 
-                src="/lovable-uploads/8e2e7a3c-894a-422b-a3f1-b4439a26659a.png" 
+                src="/images/logo.png" 
                 alt="La Gemme Leilões" 
                 className="h-16 md:h-22 w-auto"
               />
