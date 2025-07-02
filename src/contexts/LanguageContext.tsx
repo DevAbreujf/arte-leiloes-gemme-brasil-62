@@ -25,6 +25,7 @@ const translations = {
     privacyPolicy: 'Política de Privacidade',
     // TopBar
     serviceHours: 'Atendimento segunda a sexta das 10h às 12h ou das 14h30 às 17h',
+    serviceHoursMobile: 'Seg a Sex: 10h-12h ou 14h30-17h',
     // Footer
     serviceTitle: 'Atendimento',
     contactTitle: 'Contato',
@@ -47,6 +48,7 @@ const translations = {
     privacyPolicy: 'Privacy Policy',
     // TopBar
     serviceHours: 'Service Monday to Friday from 10am to 12pm or 2:30pm to 5pm',
+    serviceHoursMobile: 'Mon-Fri: 10am-12pm or 2:30pm-5pm',
     // Footer
     serviceTitle: 'Service',
     contactTitle: 'Contact',

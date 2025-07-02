@@ -39,8 +39,8 @@ const Layout = ({ children }: LayoutProps) => {
       <Header onMenuToggle={toggleMenu} />
       <SideMenu isOpen={isMenuOpen} onClose={closeMenu} />
       
-      {/* Conteúdo principal - TopBar (48px) + Header mobile (80px) / desktop (112px) */}
-      <main className="pt-32 md:pt-40 min-h-screen w-full">
+      {/* Conteúdo principal - TopBar mobile (70px) + Header mobile (80px) = 150px / desktop (48px + 112px) = 160px */}
+      <main className="pt-[150px] md:pt-40 min-h-screen w-full">
         {children}
       </main>
       
