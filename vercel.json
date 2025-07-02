@@ -1,11 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/admin(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/((?!api/).*))",
+      "source": "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|images|assets).*)",
       "destination": "/index.html"
     }
   ],
