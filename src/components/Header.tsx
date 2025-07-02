@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useIsMobile } from '../hooks/use-mobile';
 import LanguageSelector from './LanguageSelector';
 import MobileLanguageSelector from './MobileLanguageSelector';
 
@@ -14,12 +15,14 @@ interface HeaderProps {
  * Cabeçalho fixo com logo, navegação principal e botão de menu - otimizado para mobile
  */
 const Header = ({ onMenuToggle }: HeaderProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isMobile = useIsMobile();
+  
 
   return (
-    <header className="fixed top-12 left-0 right-0 bg-white shadow-sm z-40 border-b border-gray-200">
-      <div className="container mx-auto px-6 md:px-12 lg:px-24">
-        <div className="flex items-center h-20 md:h-28">
+    <header className="fixed top-12 left-0 right-0 bg-white shadow-sm z-40 border-b border-gray-200 overflow-visible">
+      <div className="container mx-auto px-6 md:px-12 lg:px-24 overflow-visible">
+        <div className="flex items-center h-20 md:h-28 overflow-visible">
           {/* Logo */}
           <div className="flex-shrink-0 mr-4 md:mr-0">
             <Link to="/">
@@ -64,9 +67,10 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
             </div>
             
             {/* Mobile Language Selector */}
-            <div className="md:hidden">
+            <div className="md:hidden relative overflow-visible">
               <MobileLanguageSelector />
             </div>
+            
             
             <button
               onClick={onMenuToggle}

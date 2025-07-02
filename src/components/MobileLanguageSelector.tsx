@@ -1,115 +1,171 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useIsMobile } from '../hooks/use-mobile';
 
 /**
  * Componente MobileLanguageSelector
- * Seletor de idioma otimizado para mobile - mostra apenas bandeiras em mobile
+ * Versão ultra-robusta com tratamento separado de eventos
  */
 const MobileLanguageSelector = () => {
   const { language, setLanguage } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  const toggleSelector = () => {
-    if (!isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + 8,
-        right: window.innerWidth - rect.right
-      });
-    }
-    setIsOpen(!isOpen);
+  const handleToggle = () => {
+    setIsOpen(prev => !prev);
   };
 
-  const handleLanguageChange = (newLanguage: 'pt' | 'en') => {
-    setLanguage(newLanguage);
+  const handleLanguageSelect = (newLanguage: 'pt' | 'en') => {
+    // Fechar dropdown
     setIsOpen(false);
+    
+    // Usar requestAnimationFrame para garantir que a mudança aconteça no próximo frame
+    requestAnimationFrame(() => {
+      setLanguage(newLanguage);
+    });
   };
+
+  // Calcular posição do dropdown
+  const getDropdownPosition = () => {
+    if (!containerRef.current) return { top: 0, right: 0 };
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    return {
+      top: rect.bottom + 8,
+      right: window.innerWidth - rect.right
+    };
+  };
+
 
   // Fechar dropdown quando clicar fora
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+    const handleOutsideClick = (event: Event) => {
+      const target = event.target as Node;
+      
+      // Verificar se o clique foi fora do botão e fora do dropdown
+      if (containerRef.current && !containerRef.current.contains(target)) {
+        // Também verificar se não foi clique no dropdown (que está no portal)
+        const dropdownElement = document.querySelector('[data-mobile-language-dropdown]');
+        if (!dropdownElement || !dropdownElement.contains(target)) {
+          setIsOpen(false);
+        }
       }
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('touchstart', handleOutsideClick, { passive: true });
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
     };
   }, [isOpen]);
 
-  if (isMobile) {
-    return (
-      <div className="relative">
-        <button
-          ref={buttonRef}
-          onClick={toggleSelector}
-          className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded-md hover:border-gray-400 focus:ring-2 focus:ring-gray-500 focus:outline-none"
-        >
-          <img 
-            src={language === 'pt' 
-              ? "/images/flags/brazil.png" 
-              : "/images/flags/usa.png"
-            }
-            alt={language === 'pt' ? "Bandeira do Brasil" : "Bandeira dos EUA"}
-            className="w-4 h-3 rounded-sm object-cover"
-          />
-        </button>
-        
-        {isOpen && (
-          <>
-            {/* Overlay transparente para capturar cliques fora */}
-            <div 
-              className="fixed inset-0 z-[9998] bg-transparent"
-              onClick={() => setIsOpen(false)}
-            />
-            {/* Dropdown fixo */}
-            <div 
-              className="fixed bg-white border border-gray-300 shadow-xl rounded-md z-[9999] min-w-[120px]"
-              style={{
-                top: `${dropdownPosition.top}px`,
-                right: `${dropdownPosition.right}px`
-              }}
-            >
-              <button
-                onClick={() => handleLanguageChange('pt')}
-                className="w-full flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 focus:bg-gray-100 text-left first:rounded-t-md"
-              >
-                <img 
-                  src="/images/flags/brazil.png" 
-                  alt="Bandeira do Brasil" 
-                  className="w-4 h-3 rounded-sm object-cover"
-                />
-                <span className="text-sm">Português</span>
-              </button>
-              <button
-                onClick={() => handleLanguageChange('en')}
-                className="w-full flex items-center space-x-2 px-3 py-2 hover:bg-gray-100 focus:bg-gray-100 text-left last:rounded-b-md"
-              >
-                <img 
-                  src="/images/flags/usa.png" 
-                  alt="Bandeira dos EUA" 
-                  className="w-4 h-3 rounded-sm object-cover"
-                />
-                <span className="text-sm">English</span>
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-    );
+  // Só renderizar em mobile
+  if (!isMobile) {
+    return null;
   }
-
-  return null;
+  
+  return (
+    <div ref={containerRef} className="relative inline-block">
+      <button
+        onClick={handleToggle}
+        className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded-md hover:border-gray-400 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-colors"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
+        <img 
+          src={language === 'pt' 
+            ? "/images/flags/brazil.png" 
+            : "/images/flags/usa.png"
+          }
+          alt={language === 'pt' ? "Bandeira do Brasil" : "Bandeira dos EUA"}
+          className="w-4 h-3 rounded-sm object-cover"
+        />
+      </button>
+      
+      {isOpen && ReactDOM.createPortal(
+        <div 
+          data-mobile-language-dropdown="true"
+          className="fixed bg-white border border-gray-300 shadow-lg rounded-md z-[9999] min-w-[140px]"
+          style={{
+            top: `${getDropdownPosition().top}px`,
+            right: `${getDropdownPosition().right}px`
+          }}
+        >
+          <button
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleLanguageSelect('pt');
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleLanguageSelect('pt');
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            className={
+              `w-full flex items-center space-x-2 px-3 py-2 text-left rounded-t-md transition-colors cursor-pointer select-none ${
+                language === 'pt' 
+                  ? 'bg-blue-50 text-blue-700' 
+                  : 'hover:bg-gray-100 text-gray-700 active:bg-gray-200'
+              }`
+            }
+            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+          >
+            <img 
+              src="/images/flags/brazil.png" 
+              alt="Brasil" 
+              className="w-4 h-3 rounded-sm object-cover pointer-events-none"
+            />
+            <span className="text-sm font-medium pointer-events-none">Português</span>
+          </button>
+          
+          <button
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleLanguageSelect('en');
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleLanguageSelect('en');
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            className={
+              `w-full flex items-center space-x-2 px-3 py-2 text-left rounded-b-md transition-colors cursor-pointer select-none ${
+                language === 'en' 
+                  ? 'bg-blue-50 text-blue-700' 
+                  : 'hover:bg-gray-100 text-gray-700 active:bg-gray-200'
+              }`
+            }
+            style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+          >
+            <img 
+              src="/images/flags/usa.png" 
+              alt="USA" 
+              className="w-4 h-3 rounded-sm object-cover pointer-events-none"
+            />
+            <span className="text-sm font-medium pointer-events-none">English</span>
+          </button>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
 };
 
 export default MobileLanguageSelector;
