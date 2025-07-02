@@ -71,27 +71,41 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageInternal] = useState<'pt' | 'en'>(() => {
     // Tentar recuperar idioma do localStorage
-    if (typeof window !== 'undefined') {
-      const savedLanguage = localStorage.getItem('language');
-      if (savedLanguage === 'pt' || savedLanguage === 'en') {
-        return savedLanguage;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const savedLanguage = localStorage.getItem('language');
+        if (savedLanguage === 'pt' || savedLanguage === 'en') {
+          return savedLanguage;
+        }
+        // Se havia um valor inválido, limpar o localStorage
+        if (savedLanguage && savedLanguage !== 'pt' && savedLanguage !== 'en') {
+          localStorage.removeItem('language');
+        }
       }
-      // Se havia um valor inválido, limpar o localStorage
-      if (savedLanguage && savedLanguage !== 'pt' && savedLanguage !== 'en') {
-        localStorage.removeItem('language');
-      }
+    } catch (error) {
+      console.warn('LocalStorage not available:', error);
     }
+    
     // Salvar o idioma padrão no localStorage se não existir
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('language', 'pt');
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('language', 'pt');
+      }
+    } catch (error) {
+      console.warn('Could not save to localStorage:', error);
     }
+    
     return 'pt';
   });
   
   const setLanguage = (lang: 'pt' | 'en') => {
     // Salvar no localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('language', lang);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('language', lang);
+      }
+    } catch (error) {
+      console.warn('Could not save language to localStorage:', error);
     }
     
     setLanguageInternal(lang);
