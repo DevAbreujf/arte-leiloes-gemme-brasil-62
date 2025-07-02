@@ -94,7 +94,7 @@ const SideMenu = ({ isOpen, onClose }: SideMenuProps) => {
   ];
 
   return (
-    <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
+    <div className={`fixed top-0 right-0 h-full w-[85vw] max-w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
       isOpen ? 'translate-x-0' : 'translate-x-full'
     }`}>
       <div className="flex flex-col h-full">
@@ -109,6 +109,16 @@ const SideMenu = ({ isOpen, onClose }: SideMenuProps) => {
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
+        </div>
+
+        {/* Botões de Login e Cadastro */}
+        <div className="px-4 py-4 border-b border-gray-200">
+          <a href="https://www.iarremate.com/login" className="block w-full text-center px-3 py-2 mb-2 bg-lagemme-dark text-white rounded-md hover:bg-lagemme-medium transition-colors duration-200 text-sm">
+            {t('login')}
+          </a>
+          <a href="https://www.iarremate.com/cadastro" className="block w-full text-center px-3 py-2 bg-lagemme-dark text-white rounded-md hover:bg-lagemme-medium transition-colors duration-200 text-sm">
+            {t('signup')}
+          </a>
         </div>
 
         {/* Lista de navegação */}

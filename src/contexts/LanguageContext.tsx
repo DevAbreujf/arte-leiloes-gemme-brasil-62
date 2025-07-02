@@ -15,6 +15,8 @@ const translations = {
     home: 'Home',
     catalogs: 'Catálogos',
     menu: 'Menu',
+    login: 'Login',
+    signup: 'Cadastre-se',
     // Menu lateral
     howToBuy: 'Como Comprar',
     howToSell: 'Como Vender',
@@ -38,6 +40,8 @@ const translations = {
     home: 'Home',
     catalogs: 'Catalogs',
     menu: 'Menu',
+    login: 'Login',
+    signup: 'Sign Up',
     // Menu lateral
     howToBuy: 'How to Buy',
     howToSell: 'How to Sell',

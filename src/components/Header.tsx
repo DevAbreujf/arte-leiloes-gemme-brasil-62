@@ -20,9 +20,9 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
   
 
   return (
-    <header className="fixed top-[70px] md:top-12 left-0 right-0 bg-white shadow-sm z-40 border-b border-gray-200 overflow-visible">
-      <div className="container mx-auto px-6 md:px-12 lg:px-24 overflow-visible">
-        <div className="flex items-center h-20 md:h-28 overflow-visible">
+    <header className="fixed top-[70px] md:top-12 left-0 right-0 bg-white shadow-sm z-40 border-b border-gray-200 overflow-hidden">
+      <div className="container mx-auto px-4 md:px-12 lg:px-24 overflow-hidden">
+        <div className="flex items-center h-20 md:h-28 overflow-hidden w-full">
           {/* Logo */}
           <div className="flex-shrink-0 mr-4 md:mr-0">
             <Link to="/">
@@ -58,6 +58,16 @@ const Header = ({ onMenuToggle }: HeaderProps) => {
 
           {/* Espaçador para empurrar seletores e menu para a direita */}
           <div className="flex-grow"></div>
+
+          {/* Botões de Login e Cadastro */}
+          <div className="hidden md:flex space-x-3 mr-4">
+            <a href="https://www.iarremate.com/login" className="px-3 py-2 bg-lagemme-dark text-white rounded-md hover:bg-lagemme-medium transition-colors duration-200 text-sm">
+              {t('login')}
+            </a>
+            <a href="https://www.iarremate.com/cadastro" className="px-3 py-2 bg-lagemme-dark text-white rounded-md hover:bg-lagemme-medium transition-colors duration-200 text-sm">
+              {t('signup')}
+            </a>
+          </div>
 
           {/* Seletores de idioma e botão menu */}
           <div className="flex items-center space-x-2 md:space-x-4">
