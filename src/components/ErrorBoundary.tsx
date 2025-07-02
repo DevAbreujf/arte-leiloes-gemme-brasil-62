@@ -31,6 +31,10 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
+  resetError = () => {
+    this.setState({ hasError: false });
+  };
+
   render() {
     if (this.state.hasError) {
       // Interface de fallback customizada
@@ -52,12 +56,20 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             <p className="text-gray-600 mb-4">
               Ocorreu um erro inesperado. Por favor, recarregue a página ou tente novamente mais tarde.
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-            >
-              Recarregar Página
-            </button>
+            <div className="space-y-2">
+              <button
+                onClick={this.resetError}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              >
+                Tentar Novamente
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              >
+                Recarregar Página
+              </button>
+            </div>
           </div>
         </div>
       );
