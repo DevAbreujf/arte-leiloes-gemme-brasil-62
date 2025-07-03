@@ -16,7 +16,8 @@ import {
   Trash2,
   Users,
   UserPlus,
-  Eye
+  Eye,
+  Edit3
 } from 'lucide-react';
 
 interface AuctionFormData {
@@ -50,6 +51,17 @@ const AdminPanel = () => {
   const [auctions, setAuctions] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Estados para edição de leilões
+  const [editingAuction, setEditingAuction] = useState<any>(null);
+  const [editForm, setEditForm] = useState<AuctionFormData>({
+    name: '',
+    link: '',
+    start_date: '',
+    end_date: '',
+    image_file: null
+  });
+  const [editImagePreview, setEditImagePreview] = useState<string>('');
+
   // Estados para gerenciamento de usuários
   const [adminForm, setAdminForm] = useState<AdminFormData>({
     email: '',
@@ -60,6 +72,83 @@ const AdminPanel = () => {
   useEffect(() => {
     checkUser();
   }, []);
+
+  // REALTIME SUBSCRIPTIONS
+  useEffect(() => {
+    if (!user) return;
+
+    // Subscription para tabela de leilões
+    const auctionsSubscription = supabase
+      .channel('auctions-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'auctions' },
+        (payload) => {
+          console.log('Mudança nos leilões:', payload);
+          
+          // Recarregar dados quando há mudanças
+          loadDashboardData();
+          
+          // Toast de notificação baseado no evento
+          switch (payload.eventType) {
+            case 'INSERT':
+              toast({
+                title: "Novo leilão criado",
+                description: `Leilão "${payload.new.name}" foi adicionado.`,
+              });
+              break;
+            case 'UPDATE':
+              toast({
+                title: "Leilão atualizado",
+                description: `Leilão "${payload.new.name}" foi modificado.`,
+              });
+              break;
+            case 'DELETE':
+              toast({
+                title: "Leilão removido",
+                description: "Um leilão foi removido do sistema.",
+              });
+              break;
+          }
+        }
+      )
+      .subscribe();
+
+    // Subscription para tabela de admins
+    const adminsSubscription = supabase
+      .channel('admins-changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'admins' },
+        (payload) => {
+          console.log('Mudança nos admins:', payload);
+          
+          // Recarregar lista de admins
+          loadAdmins();
+          
+          // Toast de notificação
+          switch (payload.eventType) {
+            case 'INSERT':
+              toast({
+                title: "Novo administrador",
+                description: `Admin "${payload.new.email}" foi adicionado.`,
+              });
+              break;
+            case 'DELETE':
+              toast({
+                title: "Administrador removido",
+                description: "Um administrador foi removido do sistema.",
+              });
+              break;
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup das subscriptions
+    return () => {
+      auctionsSubscription.unsubscribe();
+      adminsSubscription.unsubscribe();
+    };
+  }, [user]);
 
   const checkUser = async () => {
     try {
@@ -326,6 +415,127 @@ const AdminPanel = () => {
       loadDashboardData();
     } catch (error) {
       console.error('Erro ao deletar leilão:', error);
+    }
+  };
+
+  // FUNÇÕES PARA EDIÇÃO DE LEILÕES
+  const startEditAuction = (auction: any) => {
+    setEditingAuction(auction);
+    setEditForm({
+      name: auction.name,
+      link: auction.link,
+      start_date: auction.start_date ? new Date(auction.start_date).toISOString().slice(0, 16) : '',
+      end_date: auction.end_date ? new Date(auction.end_date).toISOString().slice(0, 16) : '',
+      image_file: null
+    });
+    setEditImagePreview(auction.image_url || '');
+  };
+
+  const cancelEdit = () => {
+    setEditingAuction(null);
+    setEditForm({
+      name: '',
+      link: '',
+      start_date: '',
+      end_date: '',
+      image_file: null
+    });
+    setEditImagePreview('');
+  };
+
+  const handleEditImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        toast({
+          title: "Arquivo muito grande",
+          description: "A imagem deve ter no máximo 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        toast({
+          title: "Formato inválido",
+          description: "Suporta JPG, PNG, WebP e GIF (máx. 5MB).",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setEditForm({ ...editForm, image_file: file });
+      
+      // Preview da imagem
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setEditImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const saveEditedAuction = async () => {
+    if (!editForm.name || !editForm.link || !editForm.start_date || !editingAuction) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha nome, link e data de início.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      let imageUrl = editingAuction.image_url;
+      
+      if (editForm.image_file) {
+        const newImageUrl = await uploadImage(editForm.image_file);
+        if (!newImageUrl) {
+          toast({
+            title: "Erro no upload da imagem",
+            description: "Tente novamente.",
+            variant: "destructive",
+          });
+          return;
+        }
+        imageUrl = newImageUrl;
+      }
+
+      const { error } = await supabase
+        .from('auctions')
+        .update({
+          name: editForm.name,
+          link: editForm.link,
+          start_date: editForm.start_date,
+          end_date: editForm.end_date || null,
+          image_url: imageUrl
+        })
+        .eq('id', editingAuction.id);
+
+      if (error) {
+        toast({
+          title: "Erro ao atualizar",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Leilão atualizado!",
+        description: "As alterações foram salvas com sucesso.",
+      });
+
+      cancelEdit();
+      loadDashboardData();
+    } catch (error) {
+      console.error('Erro ao atualizar leilão:', error);
+      toast({
+        title: "Erro inesperado",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -693,10 +903,18 @@ const AdminPanel = () => {
                             <Button 
                               variant="outline" 
                               size="sm"
+                              onClick={() => startEditAuction(auction)}
+                              className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                            >
+                              <Edit3 className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
                               onClick={() => deleteAuction(auction.id, auction.name)}
                               className="text-red-600 border-red-300 hover:bg-red-50"
                             >
-                              Encerrar Leilão
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -813,6 +1031,128 @@ const AdminPanel = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Modal de Edição de Leilão */}
+      {editingAuction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Editar Leilão</h2>
+                <Button variant="outline" size="sm" onClick={cancelEdit}>
+                  ✕
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="editName">
+                      Nome do Leilão <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="editName"
+                      type="text"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="editLink">
+                      Link do Leilão <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="editLink"
+                      type="url"
+                      value={editForm.link}
+                      onChange={(e) => setEditForm({ ...editForm, link: e.target.value })}
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="editStartDate">
+                      Data e Hora de Início <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="editStartDate"
+                      type="datetime-local"
+                      value={editForm.start_date}
+                      onChange={(e) => setEditForm({ ...editForm, start_date: e.target.value })}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="editEndDate">Data e Hora de Encerramento (Opcional)</Label>
+                    <Input
+                      id="editEndDate"
+                      type="datetime-local"
+                      value={editForm.end_date}
+                      onChange={(e) => setEditForm({ ...editForm, end_date: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                {/* Upload de Nova Imagem */}
+                <div className="space-y-2">
+                  <Label>Alterar Imagem (Opcional)</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleEditImageSelect}
+                      className="hidden"
+                      id="editImageInput"
+                    />
+                    <div className="space-y-2">
+                      <Upload className="h-6 w-6 text-gray-400 mx-auto" />
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => document.getElementById('editImageInput')?.click()}
+                          className="text-blue-600 hover:text-blue-500"
+                        >
+                          Selecionar nova imagem
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        JPG, PNG, WebP e GIF (máx. 5MB)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preview da Imagem */}
+                {editImagePreview && (
+                  <div className="space-y-2">
+                    <Label>Preview da Imagem</Label>
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex justify-center">
+                        <img
+                          src={editImagePreview}
+                          alt="Preview"
+                          className="max-w-xs max-h-48 object-cover rounded"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex space-x-3 pt-4">
+                  <Button onClick={saveEditedAuction} className="flex-1 bg-blue-600 hover:bg-blue-700">
+                    Salvar Alterações
+                  </Button>
+                  <Button variant="outline" onClick={cancelEdit} className="flex-1">
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

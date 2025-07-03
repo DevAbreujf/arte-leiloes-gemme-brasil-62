@@ -29,6 +29,28 @@ const Catalogos = () => {
     loadActiveAuctions();
   }, []);
 
+  // REALTIME SUBSCRIPTION
+  useEffect(() => {
+    // Subscription para atualizações em tempo real dos leilões
+    const auctionsSubscription = supabase
+      .channel('catalog-auctions-changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'auctions' },
+        (payload) => {
+          console.log('Mudança nos leilões (catálogo):', payload);
+          
+          // Recarregar dados quando há mudanças
+          loadActiveAuctions();
+        }
+      )
+      .subscribe();
+
+    // Cleanup da subscription
+    return () => {
+      auctionsSubscription.unsubscribe();
+    };
+  }, []);
+
   const loadActiveAuctions = async () => {
     try {
       setLoading(true);
