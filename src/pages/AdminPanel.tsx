@@ -17,7 +17,8 @@ import {
   Users,
   UserPlus,
   Eye,
-  Edit3
+  Edit3,
+  Info
 } from 'lucide-react';
 
 interface AuctionFormData {
@@ -751,9 +752,17 @@ const AdminPanel = () => {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="auctionName">
-                      Nome do Leilão <span className="text-red-500">*</span>
-                    </Label>
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="auctionName">
+                        Nome do Leilão <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="group relative">
+                        <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                          Nome que aparecerá no catálogo do site
+                        </div>
+                      </div>
+                    </div>
                     <Input
                       id="auctionName"
                       type="text"
@@ -764,9 +773,17 @@ const AdminPanel = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="auctionLink">
-                      Link do Leilão <span className="text-red-500">*</span>
-                    </Label>
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="auctionLink">
+                        Link do Leilão <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="group relative">
+                        <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                          URL onde o leilão será realizado
+                        </div>
+                      </div>
+                    </div>
                     <Input
                       id="auctionLink"
                       type="url"
@@ -779,9 +796,17 @@ const AdminPanel = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="startDate">
-                      Data e Hora de Início <span className="text-red-500">*</span>
-                    </Label>
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="startDate">
+                        Data e Hora de Início <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="group relative">
+                        <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                          Quando o leilão ficará disponível
+                        </div>
+                      </div>
+                    </div>
                     <Input
                       id="startDate"
                       type="datetime-local"
@@ -791,7 +816,15 @@ const AdminPanel = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="endDate">Data e Hora de Encerramento (Opcional)</Label>
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="endDate">Data e Hora de Encerramento (Opcional)</Label>
+                      <div className="group relative">
+                        <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                          Quando o leilão será encerrado automaticamente
+                        </div>
+                      </div>
+                    </div>
                     <Input
                       id="endDate"
                       type="datetime-local"
@@ -837,7 +870,20 @@ const AdminPanel = () => {
                 {imagePreview && (
                   <div className="space-y-2">
                     <Label>Preview</Label>
-                    <div className="border rounded-lg p-4 bg-gray-50">
+                    <div className="border rounded-lg p-4 bg-gray-50 relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImagePreview('');
+                          setAuctionForm({ ...auctionForm, image_file: null });
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                          }
+                        }}
+                        className="absolute top-2 right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                      >
+                        ✕
+                      </button>
                       <div className="flex justify-center">
                         <img
                           src={imagePreview}
@@ -876,21 +922,48 @@ const AdminPanel = () => {
                 ) : (
                   <div className="space-y-4">
                     {auctions.map((auction) => (
-                      <div key={auction.id} className="border rounded-lg p-4 space-y-2">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-semibold">{auction.name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Link: <a href={auction.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{auction.link}</a>
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Início: {new Date(auction.start_date).toLocaleString('pt-BR')}
-                            </p>
-                            {auction.end_date && (
-                              <p className="text-sm text-muted-foreground">
-                                Encerramento: {new Date(auction.end_date).toLocaleString('pt-BR')}
-                              </p>
+                      <div key={auction.id} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4 flex-1">
+                            {/* Imagem pequena do leilão */}
+                            {auction.image_url ? (
+                              <div className="flex-shrink-0">
+                                <img
+                                  src={auction.image_url}
+                                  alt={auction.name}
+                                  className="w-12 h-12 object-cover rounded-lg border"
+                                />
+                              </div>
+                            ) : (
+                              <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg border flex items-center justify-center">
+                                <span className="text-gray-400 text-xs font-medium">IMG</span>
+                              </div>
                             )}
+                            
+                            {/* Informações principais */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <h4 className="font-semibold text-gray-900 truncate">{auction.name}</h4>
+                                <span className={`inline-flex px-2 py-1 text-xs rounded-full shrink-0 ${
+                                  auction.is_active 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {auction.is_active ? 'Ativo' : 'Inativo'}
+                                </span>
+                              </div>
+                              <p className="text-sm text-muted-foreground truncate">
+                                Link: <a href={auction.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{auction.link}</a>
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                Início: {new Date(auction.start_date).toLocaleString('pt-BR')}
+                              </p>
+                              {auction.end_date && (
+                                <p className="text-sm text-muted-foreground">
+                                  Encerramento: {new Date(auction.end_date).toLocaleString('pt-BR')}
+                                </p>
+                              )}
+                            </div>
                           </div>
                           <div className="flex space-x-2">
                             <Button 
@@ -1128,7 +1201,17 @@ const AdminPanel = () => {
                 {editImagePreview && (
                   <div className="space-y-2">
                     <Label>Preview da Imagem</Label>
-                    <div className="border rounded-lg p-4 bg-gray-50">
+                    <div className="border rounded-lg p-4 bg-gray-50 relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditImagePreview('');
+                          setEditForm({ ...editForm, image_file: null });
+                        }}
+                        className="absolute top-2 right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                      >
+                        ✕
+                      </button>
                       <div className="flex justify-center">
                         <img
                           src={editImagePreview}
