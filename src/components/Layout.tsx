@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TopBar from './TopBar';
 import Header from './Header';
 import Footer from './Footer';
@@ -16,6 +16,25 @@ interface LayoutProps {
  */
 const Layout = ({ children }: LayoutProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Previne o scroll da página quando o menu está aberto
+  useEffect(() => {
+    if (isMenuOpen) {
+      // Salva a posição atual do scroll
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      
+      return () => {
+        // Restaura o scroll quando o menu fecha
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isMenuOpen]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
