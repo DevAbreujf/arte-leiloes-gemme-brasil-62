@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, getUser, signOut } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
@@ -11,18 +11,51 @@ import {
   LogOut, 
   Calendar, 
   Shield,
-  Clock
+  Clock,
+  Upload,
+  Trash2,
+  Users,
+  UserPlus,
+  Eye
 } from 'lucide-react';
+
+interface AuctionFormData {
+  name: string;
+  link: string;
+  start_date: string;
+  end_date: string;
+  image_file: File | null;
+}
+
+interface AdminFormData {
+  email: string;
+  password: string;
+}
 
 const AdminPanel = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [auctionName, setAuctionName] = useState('');
-  const [auctionLink, setAuctionLink] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [auctions, setAuctions] = useState<any[]>([]);
+  const [activeAuctions, setActiveAuctions] = useState(0);
   const navigate = useNavigate();
+
+  // Estados para formulário de leilão
+  const [auctionForm, setAuctionForm] = useState<AuctionFormData>({
+    name: '',
+    link: '',
+    start_date: '',
+    end_date: '',
+    image_file: null
+  });
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const [auctions, setAuctions] = useState<any[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Estados para gerenciamento de usuários
+  const [adminForm, setAdminForm] = useState<AdminFormData>({
+    email: '',
+    password: ''
+  });
+  const [admins, setAdmins] = useState<any[]>([]);
 
   useEffect(() => {
     checkUser();
@@ -36,11 +69,38 @@ const AdminPanel = () => {
         return;
       }
       setUser(currentUser);
+      loadDashboardData();
     } catch (error) {
       console.error('Erro ao verificar usuário:', error);
       navigate('/admin');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadDashboardData = async () => {
+    await Promise.all([
+      loadAuctions(),
+      loadAdmins(),
+      countActiveAuctions()
+    ]);
+  };
+
+  const countActiveAuctions = async () => {
+    try {
+      const now = new Date().toISOString();
+      const { data, error } = await supabase
+        .from('auctions')
+        .select('id')
+        .eq('is_active', true)
+        .lte('start_date', now)
+        .or(`end_date.is.null,end_date.gt.${now}`);
+
+      if (!error && data) {
+        setActiveAuctions(data.length);
+      }
+    } catch (error) {
+      console.error('Erro ao contar leilões ativos:', error);
     }
   };
 
@@ -61,8 +121,65 @@ const AdminPanel = () => {
     }
   };
 
+  // FUNÇÕES DE UPLOAD DE IMAGEM
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        toast({
+          title: "Arquivo muito grande",
+          description: "A imagem deve ter no máximo 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        toast({
+          title: "Formato inválido",
+          description: "Suporta JPG, PNG, WebP e GIF (máx. 5MB).",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAuctionForm({ ...auctionForm, image_file: file });
+      
+      // Preview da imagem
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileName = `auction-${Date.now()}-${file.name}`;
+      const { data, error } = await supabase.storage
+        .from('auction-images')
+        .upload(fileName, file);
+
+      if (error) {
+        console.error('Erro no upload:', error);
+        return null;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('auction-images')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Erro no upload:', error);
+      return null;
+    }
+  };
+
   const handleSaveAuction = async () => {
-    if (!auctionName || !auctionLink || !startDate) {
+    if (!auctionForm.name || !auctionForm.link || !auctionForm.start_date) {
       toast({
         title: "Campos obrigatórios",
         description: "Preencha nome, link e data de início.",
@@ -72,14 +189,30 @@ const AdminPanel = () => {
     }
 
     try {
+      let imageUrl = null;
+      
+      if (auctionForm.image_file) {
+        imageUrl = await uploadImage(auctionForm.image_file);
+        if (!imageUrl) {
+          toast({
+            title: "Erro no upload da imagem",
+            description: "Tente novamente.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
       const { error } = await supabase
         .from('auctions')
         .insert({
-          name: auctionName,
-          link: auctionLink,
-          start_date: startDate,
-          end_date: endDate || null,
+          name: auctionForm.name,
+          link: auctionForm.link,
+          start_date: auctionForm.start_date,
+          end_date: auctionForm.end_date || null,
+          image_url: imageUrl,
           is_active: true,
+          created_by: user.id
         });
 
       if (error) {
@@ -97,13 +230,19 @@ const AdminPanel = () => {
       });
 
       // Limpar formulário
-      setAuctionName('');
-      setAuctionLink('');
-      setStartDate('');
-      setEndDate('');
+      setAuctionForm({
+        name: '',
+        link: '',
+        start_date: '',
+        end_date: '',
+        image_file: null
+      });
+      setImagePreview('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       
-      // Recarregar leilões
-      loadAuctions();
+      loadDashboardData();
     } catch (error) {
       console.error('Erro ao salvar leilão:', error);
       toast({
@@ -132,7 +271,38 @@ const AdminPanel = () => {
     }
   };
 
-  const deleteAuction = async (id: string) => {
+  const endAuction = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('auctions')
+        .update({ is_active: false })
+        .eq('id', id);
+
+      if (error) {
+        toast({
+          title: "Erro ao encerrar",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Leilão encerrado",
+        description: "O leilão foi encerrado com sucesso.",
+      });
+
+      loadDashboardData();
+    } catch (error) {
+      console.error('Erro ao encerrar leilão:', error);
+    }
+  };
+
+  const deleteAuction = async (id: string, name: string) => {
+    if (!confirm(`Tem certeza que deseja deletar o leilão "${name}"? Esta ação não pode ser desfeita.`)) {
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('auctions')
@@ -141,7 +311,7 @@ const AdminPanel = () => {
 
       if (error) {
         toast({
-          title: "Erro ao excluir",
+          title: "Erro ao deletar",
           description: error.message,
           variant: "destructive",
         });
@@ -149,13 +319,132 @@ const AdminPanel = () => {
       }
 
       toast({
-        title: "Leilão excluído",
-        description: "O leilão foi removido com sucesso.",
+        title: "Leilão deletado",
+        description: "O leilão foi removido permanentemente.",
       });
 
-      loadAuctions();
+      loadDashboardData();
     } catch (error) {
-      console.error('Erro ao excluir leilão:', error);
+      console.error('Erro ao deletar leilão:', error);
+    }
+  };
+
+  // FUNÇÕES DE ADMINISTRADORES
+  const loadAdmins = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('admins')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Erro ao carregar admins:', error);
+        return;
+      }
+
+      setAdmins(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar admins:', error);
+    }
+  };
+
+  const addAdmin = async () => {
+    if (!adminForm.email || !adminForm.password) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha email e senha.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (adminForm.password.length < 8) {
+      toast({
+        title: "Senha muito curta",
+        description: "Mín. 8 caracteres",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Criar usuário no auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: adminForm.email,
+        password: adminForm.password,
+      });
+
+      if (authError) {
+        toast({
+          title: "Erro ao criar usuário",
+          description: authError.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (authData.user) {
+        // Adicionar na tabela admins
+        const { error: adminError } = await supabase
+          .from('admins')
+          .insert({
+            user_id: authData.user.id,
+            email: adminForm.email,
+            role: 'admin',
+            is_active: true
+          });
+
+        if (adminError) {
+          toast({
+            title: "Erro ao adicionar admin",
+            description: adminError.message,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        toast({
+          title: "Administrador adicionado!",
+          description: "O novo administrador foi criado com sucesso.",
+        });
+
+        setAdminForm({ email: '', password: '' });
+        loadAdmins();
+      }
+    } catch (error) {
+      console.error('Erro ao adicionar admin:', error);
+      toast({
+        title: "Erro inesperado",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const removeAdmin = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('admins')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        toast({
+          title: "Erro ao remover",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Administrador removido",
+        description: "O administrador foi removido com sucesso.",
+      });
+
+      loadAdmins();
+    } catch (error) {
+      console.error('Erro ao remover admin:', error);
     }
   };
 
@@ -216,8 +505,8 @@ const AdminPanel = () => {
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{auctions.length}</div>
-              <p className="text-xs text-muted-foreground">Leilões configurados</p>
+              <div className="text-2xl font-bold">{activeAuctions}</div>
+              <p className="text-xs text-muted-foreground">Leilões ativos agora</p>
             </CardContent>
           </Card>
 
@@ -252,36 +541,42 @@ const AdminPanel = () => {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="auctionName">Nome do Leilão</Label>
+                    <Label htmlFor="auctionName">
+                      Nome do Leilão <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="auctionName"
                       type="text"
                       placeholder="Ex: Leilão de Arte Contemporânea"
-                      value={auctionName}
-                      onChange={(e) => setAuctionName(e.target.value)}
+                      value={auctionForm.name}
+                      onChange={(e) => setAuctionForm({ ...auctionForm, name: e.target.value })}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="auctionLink">Link do Leilão</Label>
+                    <Label htmlFor="auctionLink">
+                      Link do Leilão <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="auctionLink"
                       type="url"
                       placeholder="https://exemplo.com/leilao"
-                      value={auctionLink}
-                      onChange={(e) => setAuctionLink(e.target.value)}
+                      value={auctionForm.link}
+                      onChange={(e) => setAuctionForm({ ...auctionForm, link: e.target.value })}
                     />
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="startDate">Data e Hora de Início</Label>
+                    <Label htmlFor="startDate">
+                      Data e Hora de Início <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="startDate"
                       type="datetime-local"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
+                      value={auctionForm.start_date}
+                      onChange={(e) => setAuctionForm({ ...auctionForm, start_date: e.target.value })}
                     />
                   </div>
                   
@@ -290,16 +585,66 @@ const AdminPanel = () => {
                     <Input
                       id="endDate"
                       type="datetime-local"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
+                      value={auctionForm.end_date}
+                      onChange={(e) => setAuctionForm({ ...auctionForm, end_date: e.target.value })}
                     />
                     <p className="text-xs text-muted-foreground">
                       Se não preenchido, o leilão ficará aberto indefinidamente
                     </p>
                   </div>
                 </div>
+
+                {/* Upload de Imagem */}
+                <div className="space-y-2">
+                  <Label>Imagem do Leilão (Opcional)</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+                    <div className="space-y-2">
+                      <Upload className="h-8 w-8 text-gray-400 mx-auto" />
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="text-blue-600 hover:text-blue-500"
+                        >
+                          Arraste uma imagem aqui ou clique para selecionar
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Suporta JPG, PNG, WebP e GIF (máx. 5MB)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preview da Imagem */}
+                {imagePreview && (
+                  <div className="space-y-2">
+                    <Label>Preview</Label>
+                    <div className="border rounded-lg p-4 bg-gray-50">
+                      <div className="flex justify-center">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="max-w-xs max-h-48 object-cover rounded"
+                        />
+                      </div>
+                      <p className="text-center text-sm text-gray-600 mt-2">Imagem atual</p>
+                    </div>
+                  </div>
+                )}
+
+                <p className="text-xs text-gray-500">
+                  Selecione uma imagem (JPG, PNG, WebP ou GIF - máximo 5MB)
+                </p>
                 
-                <Button onClick={handleSaveAuction} className="w-full">
+                <Button onClick={handleSaveAuction} className="w-full bg-gray-600 hover:bg-gray-700">
                   Salvar Leilão
                 </Button>
               </CardContent>
@@ -337,13 +682,23 @@ const AdminPanel = () => {
                               </p>
                             )}
                           </div>
-                          <Button 
-                            variant="destructive" 
-                            size="sm"
-                            onClick={() => deleteAuction(auction.id)}
-                          >
-                            Excluir
-                          </Button>
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => window.open(auction.link, '_blank')}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => deleteAuction(auction.id, auction.name)}
+                              className="text-red-600 border-red-300 hover:bg-red-50"
+                            >
+                              Encerrar Leilão
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -354,23 +709,105 @@ const AdminPanel = () => {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-4">
+            {/* Gerenciamento de Usuários */}
             <Card>
               <CardHeader>
-                <CardTitle>Configurações do Sistema</CardTitle>
+                <CardTitle className="flex items-center">
+                  <Users className="h-5 w-5 mr-2" />
+                  Gerenciamento de Usuários
+                </CardTitle>
                 <CardDescription>
-                  Ajustes gerais e configurações avançadas
+                  Adicione, remova e gerencie usuários administradores
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Funcionalidade em desenvolvimento. Aqui você poderá:
-                </p>
-                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                  <li>Configurar informações da empresa</li>
-                  <li>Gerenciar configurações de email</li>
-                  <li>Ajustar configurações de segurança</li>
-                  <li>Configurar integrações</li>
-                </ul>
+              <CardContent className="space-y-6">
+                {/* Adicionar Novo Administrador */}
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  <div className="flex items-center mb-4">
+                    <UserPlus className="h-5 w-5 mr-2" />
+                    <h3 className="font-medium">Adicionar Novo Administrador</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="adminEmail">
+                        Email do Usuário <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="adminEmail"
+                        type="email"
+                        placeholder="admin@exemplo.com"
+                        value={adminForm.email}
+                        onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="adminPassword">
+                        Senha <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="adminPassword"
+                        type="password"
+                        placeholder="Mín. 8 caracteres"
+                        value={adminForm.password}
+                        onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <Button onClick={addAdmin} className="mt-4 bg-gray-600 hover:bg-gray-700">
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Adicionar Administrador
+                  </Button>
+                </div>
+
+                {/* Lista de Administradores Atuais */}
+                <div>
+                  <h3 className="font-medium mb-4">Administradores Atuais</h3>
+                  <div className="space-y-3">
+                    {admins.map((admin) => (
+                      <div key={admin.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span className="text-blue-600 font-medium text-sm">
+                              {admin.email?.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium">{admin.email}</p>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              <span>{admin.role || 'super_admin'}</span>
+                              <span>•</span>
+                              <span>
+                                Último login: {admin.last_login 
+                                  ? new Date(admin.last_login).toLocaleDateString('pt-BR')
+                                  : 'Nunca'
+                                }
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-1 text-xs rounded ${
+                            admin.is_active 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {admin.is_active ? 'Ativo' : 'Inativo'}
+                          </span>
+                          {admin.email !== user?.email && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => removeAdmin(admin.id)}
+                              className="text-red-600 border-red-300 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

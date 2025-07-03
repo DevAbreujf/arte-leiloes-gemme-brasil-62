@@ -1,67 +1,192 @@
 
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
-import { getActiveAuction } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
+import { Button } from '../components/ui/button';
+import { useLanguage } from '../contexts/LanguageContext';
+
+interface Auction {
+  id: string;
+  name: string;
+  link: string;
+  start_date: string;
+  end_date?: string;
+  is_active: boolean;
+  image_url?: string;
+  created_at: string;
+}
 
 /**
- * Página de Catálogos
+ * Página de Catálogos - Implementada conforme as imagens
  */
 const Catalogos = () => {
-  const [auction, setAuction] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'ativos' | 'finalizados'>('ativos');
+  const [activeAuctions, setActiveAuctions] = useState<Auction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
-    const fetchAuction = async () => {
-      setLoading(true);
-      const activeAuction = await getActiveAuction();
-      setAuction(activeAuction);
-      setLoading(false);
-    };
-
-    fetchAuction();
+    loadActiveAuctions();
   }, []);
+
+  const loadActiveAuctions = async () => {
+    try {
+      setLoading(true);
+      const now = new Date().toISOString();
+      
+      const { data, error } = await supabase
+        .from('auctions')
+        .select('*')
+        .eq('is_active', true)
+        .lte('start_date', now)
+        .or(`end_date.is.null,end_date.gt.${now}`)
+        .order('start_date', { ascending: false });
+
+      if (error) {
+        console.error('Erro ao carregar leilões:', error);
+        return;
+      }
+
+      setActiveAuctions(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar leilões:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFinalizadosClick = () => {
+    // Redireciona para o site conforme especificado
+    window.open('https://www.iarremate.com/', '_blank');
+  };
 
   return (
     <Layout>
       <div className="container mx-auto px-4 py-16">
-        <div className="text-center">
+        {/* Título Principal */}
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-light text-gray-800 mb-8">
             Catálogos
           </h1>
-          {loading ? (
-            <p className="text-lg text-gray-600">Carregando...</p>
-          ) : auction ? (
-            <div className="space-y-4">
-              <p className="text-xl font-semibold">
-                Leilão Ativo: {auction.name}
-              </p>
-              <p className="text-lg">
-                <a 
-                  href={auction.link} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-blue-600 hover:underline"
-                >
-                  Acesse o Leilão
-                </a>
-              </p>
-              <p>
-                <span className="font-medium">Data de Início:</span>{' '}
-                {new Date(auction.start_date).toLocaleString('pt-BR')}
-              </p>
-              {auction.end_date && (
-                <p>
-                  <span className="font-medium">Data de Encerramento:</span>{' '}
-                  {new Date(auction.end_date).toLocaleString('pt-BR')}
-                </p>
-              )}
+          
+          {/* Tabs Ativos/Finalizados */}
+          <div className="flex justify-center mb-8">
+            <div className="bg-gray-100 rounded-lg p-1 flex">
+              <button
+                onClick={() => setActiveTab('ativos')}
+                className={`px-6 py-2 rounded-md transition-all duration-200 ${
+                  activeTab === 'ativos'
+                    ? 'bg-gray-700 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                Ativos
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('finalizados');
+                  handleFinalizadosClick();
+                }}
+                className={`px-6 py-2 rounded-md transition-all duration-200 ${
+                  activeTab === 'finalizados'
+                    ? 'bg-gray-700 text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                Finalizados
+              </button>
             </div>
-          ) : (
-            <p className="text-lg text-gray-600">
-              Estamos em captação para nosso próximo leilão.
-            </p>
-          )}
+          </div>
         </div>
+
+        {/* Conteúdo dos Leilões */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-lg text-gray-600">Carregando leilões...</p>
+          </div>
+        ) : activeAuctions.length > 0 ? (
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 gap-8 max-w-md">
+              {activeAuctions.map((auction) => (
+                <div key={auction.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+                  {/* Imagem do Leilão */}
+                  {auction.image_url ? (
+                    <div className="relative h-64">
+                      <img
+                        src={auction.image_url}
+                        alt={auction.name}
+                        className="w-full h-full object-cover"
+                      />
+                      {/* Overlay com o logo */}
+                      <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+                        <div className="text-white text-6xl font-bold tracking-wider">
+                          LA GEMME
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="h-64 bg-gray-200 flex items-center justify-center">
+                      <div className="text-gray-400 text-6xl font-bold tracking-wider">
+                        LA GEMME
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Conteúdo do Card */}
+                  <div className="p-6 text-center">
+                    <h2 className="text-2xl font-light text-gray-800 mb-4">
+                      {auction.name}
+                    </h2>
+                    
+                    <div className="space-y-2 mb-6">
+                      <p className="text-gray-600">
+                        <span className="font-medium">Início do Leilão</span>
+                      </p>
+                      <p className="text-gray-800">
+                        {new Date(auction.start_date).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                    
+                    <Button 
+                      onClick={() => window.open(auction.link, '_blank')}
+                      className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 text-lg"
+                    >
+                      Participar do Leilão
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          // Layout quando não há leilões ativos - fundo com opacidade mais escura e largura total
+          <div className="absolute left-0 right-0 text-center py-20">
+            <div className="bg-gray-600 bg-opacity-90 text-white py-20 px-8 w-full">
+              <h2 className="text-2xl font-light mb-4">
+                Estamos em captação para nosso próximo leilão
+              </h2>
+              
+              <div className="space-y-4 text-lg">
+                <p>
+                  <span className="font-medium">(21) 2541-3192 | (21) 96984-8592</span> Petrópolis
+                </p>
+                <p>
+                  <span className="font-medium">lagemmerio2@gmail.com</span>
+                </p>
+                <p className="mt-6 text-base">
+                  Fique atento às nossas redes sociais para saber quando o próximo leilão começará.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
