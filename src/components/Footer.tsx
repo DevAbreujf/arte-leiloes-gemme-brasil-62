@@ -17,7 +17,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-100 border-t border-gray-300 mt-auto w-full overflow-hidden">
-      <div className="container mx-auto px-6 md:px-12 lg:px-24 py-12 max-w-full">
+      <div className="container mx-auto px-6 md:px-16 lg:px-32 xl:px-40 py-12 max-w-full">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Menu */}
           <div className="min-w-0">
@@ -86,21 +86,22 @@ const Footer = () => {
               {t('contactTitle')}
             </h3>
             <div className="space-y-4 overflow-hidden">
-              <div className="flex items-start space-x-3 text-lagemme-medium">
-                <svg className="w-4 h-4 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                </svg>
-                <div className="text-sm min-w-0 overflow-hidden">
-                  <div className="break-words whitespace-normal">
-                    <a href="tel:+552125413192" className="hover:text-lagemme-dark transition-colors duration-200">
-                      (21) 2541-3192
-                    </a>
-                  </div>
-                  <div className="break-words whitespace-normal">
-                    <a href="tel:+5521969848592" className="hover:text-lagemme-dark transition-colors duration-200">
-                      (21) 96984-8592 Petrópolis
-                    </a>
-                  </div>
+              <div className="space-y-2">
+                <div className="flex items-start space-x-3 text-lagemme-medium">
+                  <svg className="w-4 h-4 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                  </svg>
+                  <a href="tel:+552125413192" className="text-sm hover:text-lagemme-dark transition-colors duration-200">
+                    (21) 2541-3192
+                  </a>
+                </div>
+                <div className="flex items-start space-x-3 text-lagemme-medium">
+                  <svg className="w-4 h-4 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                  </svg>
+                  <a href="tel:+5521969848592" className="text-sm hover:text-lagemme-dark transition-colors duration-200">
+                    (21) 96984-8592
+                  </a>
                 </div>
               </div>
               <div className="flex items-start space-x-3 text-lagemme-medium">

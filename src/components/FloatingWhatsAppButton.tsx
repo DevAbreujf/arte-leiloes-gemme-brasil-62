@@ -6,7 +6,7 @@ import React from 'react';
  */
 const FloatingWhatsAppButton = () => {
   const handleWhatsAppClick = () => {
-    const phoneNumber = '5521999999999'; // Formato internacional para WhatsApp
+    const phoneNumber = '5521969848592'; // Formato internacional para WhatsApp (21) 96984-8592
     const message = encodeURIComponent('Olá! Gostaria de saber mais informações sobre os leilões.');
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');

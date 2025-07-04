@@ -13,7 +13,7 @@ const TopBar = () => {
     <div className="fixed top-0 left-0 right-0 bg-gray-800 text-white z-50 h-auto md:h-12">
       {/* Desktop Layout */}
       <div className="hidden md:block py-3 px-4 h-12">
-        <div className="container mx-auto px-6 md:px-12 lg:px-24">
+        <div className="container mx-auto px-6 md:px-16 lg:px-32 xl:px-40">
           <div className="flex items-center justify-between text-sm h-full">
             <div className="font-medium">
               {t('serviceHours')}
