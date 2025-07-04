@@ -129,26 +129,20 @@ const Catalogos = () => {
           </div>
         ) : activeAuctions.length > 0 ? (
           <div className="flex justify-center">
-            <div className="grid grid-cols-1 gap-8 max-w-md">
+            <div className="grid grid-cols-1 gap-8 max-w-2xl w-full px-4">
               {activeAuctions.map((auction) => (
                 <div key={auction.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
                   {/* Imagem do Leilão */}
                   {auction.image_url ? (
-                    <div className="relative h-64">
+                    <div className="relative h-80">
                       <img
                         src={auction.image_url}
                         alt={auction.name}
                         className="w-full h-full object-cover"
                       />
-                      {/* Overlay com o logo */}
-                      <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                        <div className="text-white text-6xl font-bold tracking-wider">
-                          LA GEMME
-                        </div>
-                      </div>
                     </div>
                   ) : (
-                    <div className="h-64 bg-gray-200 flex items-center justify-center">
+                    <div className="h-80 bg-gray-200 flex items-center justify-center">
                       <div className="text-gray-400 text-6xl font-bold tracking-wider">
                         LA GEMME
                       </div>
