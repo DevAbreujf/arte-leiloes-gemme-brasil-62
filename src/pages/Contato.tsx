@@ -14,25 +14,27 @@ const Contato = () => {
   return (
     <Layout>
       {/* Seção Hero com Imagem de Fundo */}
-      <div className="relative h-64 bg-gray-600 overflow-hidden">
+      <div className="relative h-64 md:h-80 overflow-hidden">
         {/* Imagem de fundo */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+          className="absolute inset-0 bg-center bg-no-repeat"
           style={{
-            backgroundImage: 'url(/images/contact/contato-topo2.png)'
+            backgroundImage: 'url(/images/contact/contato-topo2.png)',
+            backgroundSize: 'auto 100%',
+            backgroundPosition: 'center'
           }}
-        ></div>
+        >
+        </div>
         
-        {/* Overlay escuro */}
-        <div className="absolute inset-0 bg-gray-800 bg-opacity-60"></div>
-        
-        {/* Título */}
-        <div className="relative z-10 h-full flex flex-col justify-center items-center text-white">
-          <div className="text-center">
-            <p className="text-sm mb-2 font-light tracking-wider">ENTRE EM</p>
-            <h1 className="text-4xl md:text-5xl font-light tracking-wider">
-              CONTATO
-            </h1>
+        {/* Faixa com opacidade apenas na área do texto */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-full bg-black bg-opacity-50 py-8">
+            <div className="text-center px-4">
+              <p className="text-sm text-white mb-2 tracking-wider">ENTRE EM</p>
+              <h1 className="text-4xl md:text-5xl font-light text-white">
+                CONTATO
+              </h1>
+            </div>
           </div>
         </div>
       </div>

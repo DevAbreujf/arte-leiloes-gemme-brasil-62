@@ -12,25 +12,29 @@ const QuemSomos = () => {
   return (
     <Layout>
       {/* Hero Section com imagem overlay */}
-      <div className="relative">
+      <div className="relative h-64 md:h-80 overflow-hidden">
         {/* Imagem de fundo */}
         <div 
-          className="h-64 md:h-80 bg-cover bg-center bg-no-repeat relative"
+          className="absolute inset-0 bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url('/images/hero/quem-somos-bg.png')`
+            backgroundImage: `url('/images/hero/quem-somos-bg.png')`,
+            backgroundSize: 'auto 100%',
+            backgroundPosition: 'center'
           }}
         >
-          {/* Overlay escuro para melhor legibilidade do texto */}
-          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-          
-          {/* Conteúdo do título */}
-          <div className="relative z-10 flex flex-col justify-center items-center h-full text-center px-4">
-            <div className="text-sm text-white mb-2 tracking-wider">
-              SAIBA MAIS
+        </div>
+        
+        {/* Faixa com opacidade apenas na área do texto */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-full bg-black bg-opacity-50 py-8">
+            <div className="text-center px-4">
+              <div className="text-sm text-white mb-2 tracking-wider">
+                SAIBA MAIS
+              </div>
+              <h1 className="text-4xl md:text-5xl font-light text-white">
+                {t('aboutUs')}
+              </h1>
             </div>
-            <h1 className="text-4xl md:text-5xl font-light text-white">
-              {t('aboutUs')}
-            </h1>
           </div>
         </div>
       </div>
