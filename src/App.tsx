@@ -17,6 +17,7 @@ import Contato from "./pages/Contato";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import AdminPanel from "./pages/AdminPanel";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <ScrollToTop />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/catalogos" element={<Catalogos />} />

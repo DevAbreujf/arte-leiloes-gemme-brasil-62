@@ -183,8 +183,8 @@ const Catalogos = () => {
           </div>
         ) : (
           // Layout quando não há leilões ativos - fundo com opacidade mais escura e largura total
-          <div className="absolute left-0 right-0 text-center py-20">
-            <div className="bg-gray-600 bg-opacity-90 text-white py-20 px-8 w-full">
+          <div className="text-center">
+            <div className="bg-gray-600 bg-opacity-90 text-white py-20 px-8 rounded-lg">
               <h2 className="text-2xl font-light mb-4">
                 Estamos em captação para nosso próximo leilão
               </h2>
