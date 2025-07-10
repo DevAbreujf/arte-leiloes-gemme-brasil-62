@@ -69,13 +69,13 @@ const Index = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-b from-lagemme-light/10 to-white">
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-light text-lagemme-dark mb-6 tracking-wide">
+      <section className="relative min-h-[500px] flex items-center justify-center bg-gradient-to-b from-lagemme-light/10 to-white">
+        <div className="container mx-auto px-4 py-4 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-light text-lagemme-dark mb-3 tracking-wide">
             Bem-vindos à <br className="sm:hidden" />
             La Gemme Leilões
           </h1>
-          <p className="text-base sm:text-lg md:text-lg lg:text-xl text-lagemme-medium max-w-3xl mx-auto mb-8 leading-relaxed px-4 sm:px-0 break-words">
+          <p className="text-base sm:text-lg md:text-lg lg:text-xl text-lagemme-medium max-w-3xl mx-auto mb-4 leading-relaxed px-4 sm:px-0 break-words">
             Casa de leilões especializada em joias raras, diamantes deslumbrantes e relógios exclusivos.
             <br className="hidden sm:block" />
             Explore nossa coleção cuidadosamente selecionada para verdadeiros conhecedores e colecionadores.
@@ -93,12 +93,12 @@ const Index = () => {
       </section>
 
       {/* Carousel Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl lg:text-3xl font-light text-lagemme-dark text-center mb-4">
+      <section className="py-4 bg-white">
+        <div className="container mx-auto px-4 md:px-12 lg:px-24">
+          <h2 className="text-3xl lg:text-3xl font-light text-lagemme-dark text-center mb-1">
             Destaques da Coleção
           </h2>
-          <p className="text-lagemme-medium text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-lagemme-medium text-center mb-6 max-w-2xl mx-auto">
             Peças excepcionais selecionadas por nossos especialistas
           </p>
           <JewelryCarousel />
@@ -107,11 +107,11 @@ const Index = () => {
 
       {/* Features Section */}
       <section className="py-16 bg-lagemme-light/5">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 md:px-12 lg:px-24">
           <h2 className="text-3xl lg:text-3xl font-light text-lagemme-dark text-center mb-12">
             Por que escolher La Gemme
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <Card key={index} className="border-lagemme-light/30 hover:shadow-lg transition-shadow">
                 <CardHeader>
@@ -131,11 +131,11 @@ const Index = () => {
 
       {/* Highlights Section */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 md:px-12 lg:px-24">
           <h2 className="text-3xl lg:text-3xl font-light text-lagemme-dark text-center mb-12">
             Categorias em Destaque
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
             {highlights.map((highlight, index) => (
               <div 
                 key={index} 
@@ -163,7 +163,7 @@ const Index = () => {
 
       {/* CTA Section */}
       <section className="py-16 bg-lagemme-dark text-white">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-4 md:px-12 lg:px-24 text-center">
           <h2 className="text-3xl lg:text-3xl font-light mb-8">
             Faça Parte do Mundo Exclusivo La Gemme
           </h2>
