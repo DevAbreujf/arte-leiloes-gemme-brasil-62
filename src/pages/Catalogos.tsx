@@ -1,9 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
+import { Button } from '@/components/ui/button';
 import { supabase } from '../lib/supabase';
-import { Button } from '../components/ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatDateBR } from '../utils/dateUtils';
 
 interface Auction {
   id: string;
@@ -160,13 +161,7 @@ const Catalogos = () => {
                         <span className="font-medium">Início do Leilão</span>
                       </p>
                       <p className="text-gray-800">
-                        {new Date(auction.start_date).toLocaleDateString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                        {formatDateBR(auction.start_date)}
                       </p>
                     </div>
                     

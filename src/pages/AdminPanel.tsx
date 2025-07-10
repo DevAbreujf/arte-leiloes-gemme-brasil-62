@@ -20,6 +20,7 @@ import {
   Edit3,
   Info
 } from 'lucide-react';
+import { formatDateBR, utcToLocal, localToUTC } from '../utils/dateUtils';
 
 interface AuctionFormData {
   name: string;
@@ -298,8 +299,8 @@ const AdminPanel = () => {
         .insert({
           name: auctionForm.name,
           link: auctionForm.link,
-          start_date: auctionForm.start_date,
-          end_date: auctionForm.end_date || null,
+          start_date: localToUTC(auctionForm.start_date),
+          end_date: auctionForm.end_date ? localToUTC(auctionForm.end_date) : null,
           image_url: imageUrl,
           is_active: true,
           created_by: user.id
@@ -425,8 +426,8 @@ const AdminPanel = () => {
     setEditForm({
       name: auction.name,
       link: auction.link,
-      start_date: auction.start_date ? new Date(auction.start_date).toISOString().slice(0, 16) : '',
-      end_date: auction.end_date ? new Date(auction.end_date).toISOString().slice(0, 16) : '',
+      start_date: auction.start_date ? utcToLocal(auction.start_date) : '',
+      end_date: auction.end_date ? utcToLocal(auction.end_date) : '',
       image_file: null
     });
     setEditImagePreview(auction.image_url || '');
@@ -508,8 +509,8 @@ const AdminPanel = () => {
         .update({
           name: editForm.name,
           link: editForm.link,
-          start_date: editForm.start_date,
-          end_date: editForm.end_date || null,
+          start_date: localToUTC(editForm.start_date),
+          end_date: editForm.end_date ? localToUTC(editForm.end_date) : null,
           image_url: imageUrl
         })
         .eq('id', editingAuction.id);
@@ -956,11 +957,11 @@ const AdminPanel = () => {
                                 Link: <a href={auction.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{auction.link}</a>
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                Início: {new Date(auction.start_date).toLocaleString('pt-BR')}
+                                Início: {formatDateBR(auction.start_date)}
                               </p>
                               {auction.end_date && (
                                 <p className="text-sm text-muted-foreground">
-                                  Encerramento: {new Date(auction.end_date).toLocaleString('pt-BR')}
+                                  Encerramento: {formatDateBR(auction.end_date)}
                                 </p>
                               )}
                             </div>
@@ -1069,7 +1070,7 @@ const AdminPanel = () => {
                               <span>•</span>
                               <span>
                                 Último login: {admin.last_login 
-                                  ? new Date(admin.last_login).toLocaleDateString('pt-BR')
+                                  ? formatDateBR(admin.last_login)
                                   : 'Nunca'
                                 }
                               </span>

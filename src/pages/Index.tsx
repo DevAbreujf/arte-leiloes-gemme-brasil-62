@@ -71,11 +71,11 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-b from-lagemme-light/10 to-white">
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-lagemme-dark mb-6 tracking-wide">
+          <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-light text-lagemme-dark mb-6 tracking-wide">
             Bem-vindos à <br className="sm:hidden" />
             La Gemme Leilões
           </h1>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-lagemme-medium max-w-4xl mx-auto mb-8 leading-relaxed px-4 sm:px-0">
+          <p className="text-base sm:text-lg md:text-lg lg:text-xl text-lagemme-medium max-w-3xl mx-auto mb-8 leading-relaxed px-4 sm:px-0">
             Casa de leilões especializada em joias raras, diamantes deslumbrantes e relógios exclusivos. 
             <br className="hidden sm:block" />
             Explore nossa coleção cuidadosamente selecionada para verdadeiros conhecedores e colecionadores.
@@ -95,7 +95,7 @@ const Index = () => {
       {/* Carousel Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-light text-lagemme-dark text-center mb-4">
+          <h2 className="text-3xl lg:text-3xl font-light text-lagemme-dark text-center mb-4">
             Destaques da Coleção
           </h2>
           <p className="text-lagemme-medium text-center mb-12 max-w-2xl mx-auto">
@@ -108,7 +108,7 @@ const Index = () => {
       {/* Features Section */}
       <section className="py-16 bg-lagemme-light/5">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-light text-lagemme-dark text-center mb-12">
+          <h2 className="text-3xl lg:text-3xl font-light text-lagemme-dark text-center mb-12">
             Por que escolher La Gemme
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -132,7 +132,7 @@ const Index = () => {
       {/* Highlights Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-light text-lagemme-dark text-center mb-12">
+          <h2 className="text-3xl lg:text-3xl font-light text-lagemme-dark text-center mb-12">
             Categorias em Destaque
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -150,7 +150,7 @@ const Index = () => {
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-                <h3 className="text-2xl font-light text-lagemme-dark mb-2">{highlight.title}</h3>
+                <h3 className="text-xl lg:text-2xl font-light text-lagemme-dark mb-2">{highlight.title}</h3>
                 <p className="text-lagemme-medium mb-4">{highlight.description}</p>
                 <Button variant="link" className="text-lagemme-dark p-0 hover:text-lagemme-medium">
                   {highlight.ctaText} →
@@ -164,13 +164,13 @@ const Index = () => {
       {/* CTA Section */}
       <section className="py-16 bg-lagemme-dark text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-light mb-8">
+          <h2 className="text-3xl lg:text-3xl font-light mb-8">
             Faça Parte do Mundo Exclusivo La Gemme
           </h2>
           <Button 
             size="lg" 
             variant="outline" 
-            className="border-white text-white hover:bg-white/10"
+className="border-white text-lagemme-dark hover:bg-white/10"
             onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
           >
             Falar com Especialista

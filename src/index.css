@@ -106,9 +106,14 @@
     padding: 0;
   }
   
-  /* Tipografia elegante para casa de leilões */
-  h1, h2, h3, h4, h5, h6 {
+/* Tipografia elegante para casa de leilões */
+
+.container {
+    padding: 0 1rem; /* Adicionando margem ao conteúdo da home */
+}
+h1, h2, h3, h4, h5, h6 {
     @apply font-light tracking-wide;
+    font-size: 0.9em; /* Reduzindo o tamanho da fonte */
   }
   
   /* Transições suaves para melhor UX */
@@ -121,6 +126,14 @@
 @layer utilities {
   .text-lagemme-dark {
     color: hsl(var(--lagemme-dark));
+  }
+
+  /* Ajustes específicos para desktop */
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
   
   .text-lagemme-medium {
