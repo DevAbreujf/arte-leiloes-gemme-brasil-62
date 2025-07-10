@@ -47,19 +47,19 @@ const Index = () => {
 
   const highlights = [
     {
-      image: "/images/home/23.jpg",
+      image: "/images/home/24.jpg",
       title: "Diamantes Excepcionais",
       description: "Diamantes certificados com corte perfeito e clareza excepcional.",
       ctaText: "Ver Coleção"
     },
     {
-      image: "/images/home/25.jpg",
+      image: "/images/home/32.jpg",
       title: "Joias Históricas",
       description: "Peças com proveniência histórica e valor inestimável.",
       ctaText: "Explorar"
     },
     {
-      image: "/images/home/27.jpg",
+      image: "/images/home/47.jpg",
       title: "Relógios Raros",
       description: "Edições limitadas e peças únicas de alta relojoaria.",
       ctaText: "Descobrir"
