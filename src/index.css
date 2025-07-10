@@ -221,7 +221,33 @@ html, body {
 p, span, div, a {
   word-wrap: break-word;
   overflow-wrap: break-word;
-  hyphens: auto;
+  word-break: normal;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+/* Regra específica para quebra de linha em dispositivos móveis */
+@media (max-width: 640px) {
+  p, span, div, a {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+  
+  /* Classe utilitária para forçar quebra correta de palavras */
+  .break-words {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    -webkit-hyphens: none !important;
+    -moz-hyphens: none !important;
+    -ms-hyphens: none !important;
+    hyphens: none !important;
+  }
 }
 
 /* Correções específicas para componentes Radix UI Select */

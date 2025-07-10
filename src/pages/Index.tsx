@@ -75,8 +75,8 @@ const Index = () => {
             Bem-vindos à <br className="sm:hidden" />
             La Gemme Leilões
           </h1>
-          <p className="text-base sm:text-lg md:text-lg lg:text-xl text-lagemme-medium max-w-3xl mx-auto mb-8 leading-relaxed px-4 sm:px-0">
-            Casa de leilões especializada em joias raras, diamantes deslumbrantes e relógios exclusivos. 
+          <p className="text-base sm:text-lg md:text-lg lg:text-xl text-lagemme-medium max-w-3xl mx-auto mb-8 leading-relaxed px-4 sm:px-0 break-words">
+            Casa de leilões especializada em joias raras, diamantes deslumbrantes e relógios exclusivos.
             <br className="hidden sm:block" />
             Explore nossa coleção cuidadosamente selecionada para verdadeiros conhecedores e colecionadores.
           </p>
