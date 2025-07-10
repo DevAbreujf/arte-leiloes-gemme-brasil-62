@@ -71,11 +71,13 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-b from-lagemme-light/10 to-white">
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-5xl md:text-6xl font-light text-lagemme-dark mb-6 tracking-wide">
-            Bem-vindos à La Gemme Leilões
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-lagemme-dark mb-6 tracking-wide">
+            Bem-vindos à <br className="sm:hidden" />
+            La Gemme Leilões
           </h1>
-          <p className="text-xl md:text-2xl text-lagemme-medium max-w-4xl mx-auto mb-8 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-lagemme-medium max-w-4xl mx-auto mb-8 leading-relaxed px-4 sm:px-0">
             Casa de leilões especializada em joias raras, diamantes deslumbrantes e relógios exclusivos. 
+            <br className="hidden sm:block" />
             Explore nossa coleção cuidadosamente selecionada para verdadeiros conhecedores e colecionadores.
           </p>
           <div className="flex gap-4 justify-center">
